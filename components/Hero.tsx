@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 
-// FIX: Explicitly type Dot as a React.FC to ensure special props like `key` are handled correctly by TypeScript.
 const Dot: React.FC<{ cx: number; cy: number }> = ({ cx, cy }) => (
   <circle cx={cx} cy={cy} r="3" className="fill-yellow-400" />
 );
@@ -23,21 +21,37 @@ const HeroAnimation = () => {
     { cx: 40, cy: 120 }, { cx: 80, cy: 80 }, { cx: 120, cy: 150 },
     { cx: 160, cy: 60 }, { cx: 200, cy: 130 }, { cx: 240, cy: 90 },
     { cx: 70, cy: 180 }, { cx: 180, cy: 20 },
+    // Denser field
+    { cx: 30, cy: 40 }, { cx: 50, cy: 160 }, { cx: 90, cy: 20 },
+    { cx: 110, cy: 110 }, { cx: 130, cy: 70 }, { cx: 150, cy: 180 },
+    { cx: 170, cy: 120 }, { cx: 190, cy: 80 }, { cx: 210, cy: 170 },
+    { cx: 230, cy: 50 }, { cx: 250, cy: 150 }, { cx: 270, cy: 100 },
+    { cx: 60, cy: 50 }, { cx: 140, cy: 20 }, { cx: 220, cy: 110 },
+    { cx: 100, cy: 190 }, { cx: 265, cy: 55 }, { cx: 20, cy: 80 },
   ];
 
   return (
-    <div className="relative w-full max-w-sm h-64">
+    <div className="relative w-full max-w-sm h-64 mx-auto">
       <svg viewBox="0 0 280 200" className="w-full h-full">
-        <text x="10" y="195" className="fill-slate-400 font-bold text-lg">START</text>
-        <path d="M20 180 C 60 100, 150 100, 200 40 S 260 20, 260 20" stroke="url(#line-gradient)" strokeWidth="4" fill="none" ref={pathRef} className="animate-draw" />
         <defs>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+                <feFlood floodColor="#ef4444" result="flood"/>
+                <feComposite in="flood" in2="blur" operator="in" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
             <linearGradient id="line-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#ef4444" />
                 <stop offset="100%" stopColor="#f87171" />
             </linearGradient>
         </defs>
-        <text x="230" y="15" className="fill-slate-400 font-bold text-lg">END</text>
+        <path d="M20 180 C 60 100, 150 100, 200 40 S 260 20, 260 20" stroke="url(#line-gradient)" strokeWidth="4" fill="none" ref={pathRef} className="animate-draw" filter="url(#glow)" />
         {dots.map((dot, i) => <Dot key={i} cx={dot.cx} cy={dot.cy} />)}
+        <text x="10" y="195" className="fill-slate-400 font-bold text-lg">START</text>
+        <text x="230" y="15" className="fill-slate-400 font-bold text-lg">END</text>
       </svg>
       <style>{`
         @keyframes draw {
